@@ -2,6 +2,7 @@ package it.unibo.KikiStore.engine.state;
 
 import it.unibo.KikiStore.controller.api.InputHandler;
 import it.unibo.KikiStore.engine.api.GameState;
+import it.unibo.KikiStore.engine.api.GameStateTransition;
 import it.unibo.KikiStore.model.map.impl.CollisionHandler;
 import it.unibo.KikiStore.model.map.impl.MapLoader;
 import it.unibo.KikiStore.model.map.impl.TileMapImpl;
@@ -27,27 +28,35 @@ public class TestState implements GameState {
     private final InputHandler input;
     private final PlayerImpl kiki; 
     
+    private final GameStateTransition transitionController;
+    private final CollisionHandler collisionHandler;
     private final SpriteManager spriteManager;
     private final EntityRenderer entityRenderer;
     private final MapRenderer environmentRenderer;
     
     private Camera cam = new Camera();
     private int frameCount = 0;
-    private final int[][] visualGrid;
+    private final int[][] groundGrid;
+    private final int[][] decorationGrid;
+    private final int[][] upperGrid;
+    private final int[][] maskGrid;
 
-    public TestState(InputHandler input) {
+    public TestState(GameStateTransition transitionController ,InputHandler input) {
+        this.transitionController = transitionController;
         this.input = input;
         
         // --- 1. RESOURCE LOADING ---
-        this.visualGrid = MapLoader.loadMap("maps/test.txt");
-        int[][] maskGrid = MapLoader.loadMap("maps/col/testCol.txt");
+        this.groundGrid = MapLoader.loadMap("maps/map0/testGround.txt");
+        this.decorationGrid = MapLoader.loadMap("maps/map0/testDecor.txt");
+        this.upperGrid = MapLoader.loadMap("maps/map0/testUpper.txt");
+        this.maskGrid = MapLoader.loadMap("maps/map0/col/testCol.txt");
         
         // --- 2. MODEL INITIALIZATION ---
-        GameTile collisionMap = new TileMapImpl(maskGrid, 64);
-        CollisionHandler collisionHandler = new CollisionHandler(collisionMap);
+        GameTile collisionMap = new TileMapImpl(maskGrid, 32);
+        collisionHandler = new CollisionHandler(collisionMap);
         
         // Initialize the player and inject the collision logic
-        this.kiki = new PlayerImpl(100, 100);
+        this.kiki = new PlayerImpl(220, 220);
         this.kiki.setCollisionHandler(collisionHandler); 
         
         // --- 3. VIEW INITIALIZATION ---
@@ -63,6 +72,12 @@ public class TestState implements GameState {
     public void update() {
         kiki.update(input);
         frameCount++;
+
+        int tileId = collisionHandler.getInteractableTileId(kiki.getX() + 16, kiki.getY() + 32, 32, 32);
+        if (tileId == 2 && input.isAction()) {
+            GameState newState = new TestTwoState(transitionController, input);
+            transitionController.pushState(newState);
+        }
     }
 
     @Override
@@ -80,13 +95,13 @@ public class TestState implements GameState {
         gc.translate(-cam.getX(), -cam.getY()); 
 
         // --- WORLD RENDERING ---
-        MapRenderData mapData = new MapRenderData(visualGrid, 64);
-        environmentRenderer.render(gc, mapData);
-
+        environmentRenderer.render(gc, new MapRenderData(groundGrid, 32));
+        environmentRenderer.render(gc, new MapRenderData(decorationGrid, 32));
         EntityRenderData kikiData = new EntityRenderData(
             kiki.getX(), kiki.getY(), 64, 64, "sprites/player/kiki", kiki.getState(), kiki.getDirection()
         );
         entityRenderer.render(gc, List.of(kikiData), frameCount);
+        environmentRenderer.render(gc, new MapRenderData(upperGrid, 32));
 
         gc.restore(); 
     }
