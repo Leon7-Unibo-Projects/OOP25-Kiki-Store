@@ -26,7 +26,7 @@ import java.util.List;
 public final class TestState implements GameState {
     private static final int PLAYER_X = 1850;
     private static final int PLAYER_Y = 2950;
-    private static final int[] TELEPORT1 = {2550, 1480};
+    private static final int[] TELEPORT1 = {2550, 1520};
     private static final int[] TELEPORT2 = {1280, 2410};
 
     private final InputHandler input;
@@ -92,7 +92,7 @@ public final class TestState implements GameState {
             kiki.setY(TELEPORT2[1]);
         }
         if (tileId == 4 && input.isAction()) {
-            transitionController.pushState(new TestTwoState(transitionController, input));
+            transitionController.pushState(new MinigameFly(transitionController, input));
         }
     }
 
