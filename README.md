@@ -87,7 +87,7 @@ The codebase adheres to the **Model-View-Controller (MVC)** architectural paradi
 ## 🎨 Asset Credits
 
 - **Terrain & Map Sprites:** Open-source sprites from the [LPC Terrain Repack (OpenGameArt)](https://opengameart.org/content/lpc-terrain-repack).
-- **Potion & UI Assets:** [CraftPix Animated Magic Book Pixel Art Asset Pack](https://craftpix.net/freebies/free-animated-magic-book-pixel-art-asset-pack/).
+- **Potion & UI Assets:** [CraftPix Animated Magic Book Pixel Art Asset Pack](https://craftpix.net/freebies/free-animated-magic-book-pixel-art-asset-pack/). 
 
 ## 📄 License
 
